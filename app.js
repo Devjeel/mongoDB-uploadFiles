@@ -7,8 +7,11 @@ const express = require('express'),
       cookieParser = require('cookie-parser');
 
 const path = require('path');
+//Crypto for increcption 
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+
+//Multer and gridfs for storage engine
 const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
@@ -17,10 +20,13 @@ const methodOverride = require('method-override');
 const app = express();
 
 // Middleware
+//QQ: What is method override ?
 app.use(methodOverride('_method'));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
+
+//QQ: Full form of ejs ?
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
@@ -47,7 +53,7 @@ const conn = mongoose.createConnection(mongoURI);
 let gfs;
 
 conn.once('open', () => {
-    // Init stream
+    // Init grid-stream
     gfs = Grid(conn.db, mongoose.mongo);
     gfs.collection('uploads');
 });
@@ -56,6 +62,8 @@ conn.once('open', () => {
 const storage = new GridFsStorage({
     url: mongoURI,
     file: (req, file) => {
+
+        //IMP: Promise function
         return new Promise((resolve, reject) => {
             crypto.randomBytes(16, (err, buf) => {
                 if (err) {
@@ -71,6 +79,8 @@ const storage = new GridFsStorage({
         });
     }
 });
+
+//setting multer engine
 const upload = multer({ storage });
 
 // @route GET /
